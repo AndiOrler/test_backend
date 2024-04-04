@@ -95,7 +95,7 @@ func initDatabase() (*database.Session, error) {
 		Name:                   dbName,
 		SkipDefaultTransaction: false,
 		PrepareStmt:            true,
-		LogLevel:               3,
+		LogLevel:               dbLogLevel,
 		UseSSL:                 dbUseSSL,
 	})
 
@@ -117,11 +117,12 @@ func loadEnvs() {
 	log.Println("Reading env variables from .env")
 	_ = env.LoadLocalFile()
 
-	dbHost, _ = env.GetStr("POSTGRES_HOST")
-	dbPort, _ = env.GetInt("POSTGRES_DB_P0RT")
-	dbUser, _ = env.GetStr("POSTGRES_USER")
-	dbPassword, _ = env.GetStr("POSTGRES_PASSWORD")
-	dbName, _ = env.GetStr("POSTGRES_DB")
+	dbHost, _ = env.GetStr("DB_HOST")
+	dbPort, _ = env.GetInt("DB_P0RT")
+	dbUser, _ = env.GetStr("DB_USER")
+	dbPassword, _ = env.GetStr("DB_PASSWORD")
+	dbName, _ = env.GetStr("DB_NAME")
 	dbUseSSL, _ = env.GetBool("DB_USE_SSL")
 	serverPort, _ = env.GetInt("PORT")
+	dbLogLevel, _ = env.GetInt("DB_LOG_LEVEL")
 }

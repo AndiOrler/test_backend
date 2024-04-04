@@ -4,7 +4,6 @@ services:
   db:
     container_name: test_backend_db
     image: postgres:16.2-alpine3.19
-    env_file: ../.env
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -14,6 +13,12 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - internal
+    env_file: ../.env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
 
 # docker will persist the database under: /var/lib/docker/volumes/fahrenden_pgdata/_data
 volumes:
