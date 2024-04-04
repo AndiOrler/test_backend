@@ -57,6 +57,7 @@ storage/
 seed/
 
 # makefile build folder
+tmp
 _tmp
 /test-results/
 /playwright-report/
