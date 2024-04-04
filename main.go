@@ -59,13 +59,18 @@ var (
 )
 
 func main() {
+	// no timestamp on logs
 	log.SetFlags(0)
+
 	log.Println()
 	log.Println("🚀 Starting Test Backend App")
 	log.Println("----------------------------")
 	log.Println()
 
+	// loading env
 	loadEnvs()
+
+	// connecting to db
 	session, err := initDatabase()
 
 	if err != nil {
@@ -74,6 +79,13 @@ func main() {
 	}
 
 	defer session.Close()
+
+	err = migrateDB(session)
+
+	if err != nil {
+		log.Println("DB migration failed")
+		return
+	}
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
@@ -85,7 +97,7 @@ func main() {
 }
 
 func initDatabase() (*database.Session, error) {
-	log.Println("Connecting now")
+	log.Println("Connecting to postgresdb")
 
 	session, err := database.NewSession(&database.Parameters{
 		Host:                   dbHost,
@@ -103,12 +115,7 @@ func initDatabase() (*database.Session, error) {
 		return nil, err
 	}
 
-	log.Println("💿️ Connecting to database succefull")
-
-	if session.Connection.AutoMigrate(&models.User{}) != nil {
-		log.Println("Migration failed")
-	}
-	log.Println("Migration succesful")
+	log.Println("💿️ Connecting to database successful")
 
 	return session, err
 }
@@ -125,4 +132,16 @@ func loadEnvs() {
 	dbUseSSL, _ = env.GetBool("DB_USE_SSL")
 	serverPort, _ = env.GetInt("PORT")
 	dbLogLevel, _ = env.GetInt("DB_LOG_LEVEL")
+}
+
+func migrateDB(session *database.Session) error {
+	err := session.Connection.AutoMigrate(&models.User{})
+
+	if err != nil {
+		log.Println("Migration failed")
+	}
+
+	log.Println("Migration successful")
+
+	return err
 }
