@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  db:
+    container_name: test_backend_db
+    image: postgres:16.2-alpine3.19
+    env_file: ../.env
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+
+# docker will persist the database under: /var/lib/docker/volumes/fahrenden_pgdata/_data
+volumes:
+  pgdata: {}
+
+networks:
+  internal:
+

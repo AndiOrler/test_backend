@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  pfadmin:
+    container_name: pgAdmin4-container
+    image: dpage/pgadmin4
+    env_file: ../.env
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    networks:
+      - internal
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+# docker will persist the database under: /var/lib/docker/volumes/fahrenden_pgdata/_data
+volumes:
+  pgadmin-data: {}
+
+networks:
+  internal:
