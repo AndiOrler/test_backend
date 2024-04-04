@@ -129,3 +129,16 @@ func retry(attempts int, sleep time.Duration, f func() error) error {
 
 	return fmt.Errorf("after %d attempts, last error: %w", attempts, err)
 }
+
+// Close databaes session
+func (s *Session) Close() error {
+	if s == nil {
+		return nil
+	}
+
+	if err := s.DB.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}

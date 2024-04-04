@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"test_backend/database"
 	"test_backend/models"
 	"test_backend/utils/env"
@@ -15,6 +15,9 @@ var (
 	environment       string
 	useHTTPGateway    bool
 	useAuthMiddleware bool
+
+	// web
+	serverPort int
 
 	// app
 	logLevel    int
@@ -61,26 +64,27 @@ func main() {
 	log.Println("🚀 Starting Test Backend App")
 	log.Println("----------------------------")
 	log.Println()
-	initialize()
 
-	port := os.Getenv("PORT")
+	loadEnvs()
+	session, err := initDatabase()
+
+	if err != nil {
+		log.Println("Initializing db failed")
+		return
+	}
+
+	defer session.Close()
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, foo!")
 	})
 
-	e.Logger.Fatal(e.Start(":" + port))
-
+	port := fmt.Sprintf(":%v", serverPort)
+	e.Logger.Fatal(e.Start(port))
 }
 
-func initialize() {
-	log.Println("Initializing App")
-	loadEnvs()
-	connectToDB()
-}
-
-func connectToDB() (*database.Session, error) {
+func initDatabase() (*database.Session, error) {
 	log.Println("Connecting now")
 
 	session, err := database.NewSession(&database.Parameters{
@@ -119,4 +123,5 @@ func loadEnvs() {
 	dbPassword, _ = env.GetStr("POSTGRES_PASSWORD")
 	dbName, _ = env.GetStr("POSTGRES_DB")
 	dbUseSSL, _ = env.GetBool("DB_USE_SSL")
+	serverPort, _ = env.GetInt("PORT")
 }
