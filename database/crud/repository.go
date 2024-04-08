@@ -2,23 +2,37 @@ package crud
 
 import (
 	"log"
+
+	"gorm.io/gorm"
 )
 
-type Crud interface {
-	// GetAll() []models.User
-	GetAll()
+type CrudRepository[T any] interface {
+	GetAll(model *T) []T
+	Create(model *T) error
 }
 
-type Repository struct {
+type CrudRepo[T any] struct {
+	DB    *gorm.DB
+	Model T
 }
 
-func (r Repository) GetAll() {
-	log.Println("getting all users from crud repo")
+func (r *CrudRepo[T]) GetAll(model *T) []T {
+	log.Printf("getting all %v from crud repo", model)
+
+	var allElements []T
+
+	r.DB.Find(&allElements)
+
+	return allElements
 }
 
-// func (r *Repository) GetAll() ([]models.User, error) {
+func (r *CrudRepo[T]) Create(model *T) error {
+	return r.DB.Create(model).Error
+}
 
-// 	log.Println("returning all users from crud repo")
-
-// 	return nil, nil
-// }
+func NewRepository[T any](db *gorm.DB, model T) CrudRepository[T] {
+	return &CrudRepo[T]{
+		DB:    db,
+		Model: model,
+	}
+}

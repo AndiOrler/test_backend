@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"test_backend/database"
 	"test_backend/models"
+	"test_backend/user"
 	"test_backend/utils/env"
 
 	"github.com/labstack/echo/v4"
@@ -86,6 +87,21 @@ func main() {
 		log.Println("DB migration failed")
 		return
 	}
+
+	userRepo := user.NewUserRepo(session.Connection)
+	err = userRepo.Create(&models.User{
+		Email:    "oo@test.com",
+		Password: "goo***",
+	})
+
+	if err != nil {
+		log.Printf("Creating user failed %v", err)
+	} else {
+		log.Println("User created succefully")
+	}
+
+	users := userRepo.GetAll(&models.User{})
+	log.Fatalf("Found %v users", len(users))
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
