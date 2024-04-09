@@ -7,8 +7,10 @@ import (
 )
 
 type CrudRepository[T any] interface {
-	GetAll(model *T) []T
+	GetAll() []T
+	Get(id uint) T
 	Create(model *T) error
+	Delete(model *T, id uint) error
 }
 
 type CrudRepo[T any] struct {
@@ -16,14 +18,41 @@ type CrudRepo[T any] struct {
 	Model T
 }
 
-func (r *CrudRepo[T]) GetAll(model *T) []T {
-	log.Printf("getting all %v from crud repo", model)
+func (r *CrudRepo[T]) GetAll() []T {
+	log.Printf("getting all from repo")
 
 	var allElements []T
 
 	r.DB.Find(&allElements)
 
 	return allElements
+}
+
+func (r *CrudRepo[T]) Get(id uint) T {
+
+	var result T
+
+	log.Printf("Getting entity with id %v", id)
+
+	tx := r.DB.First(&result, id)
+
+	if tx.Error != nil {
+		log.Printf("Getting entity failed %v", tx.Error)
+	}
+
+	return result
+
+}
+
+func (r *CrudRepo[T]) Delete(model *T, id uint) error {
+
+	tx := r.DB.Delete(&model, id)
+	log.Printf("delted %v", id)
+
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }
 
 func (r *CrudRepo[T]) Create(model *T) error {

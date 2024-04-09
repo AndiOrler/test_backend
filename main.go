@@ -89,19 +89,27 @@ func main() {
 	}
 
 	userRepo := user.NewUserRepo(session.Connection)
-	err = userRepo.Create(&models.User{
-		Email:    "oo@test.com",
-		Password: "goo***",
-	})
+	// err = userRepo.Create(&models.User{
+	// 	Email:    "oo@test.com",
+	// 	Password: "goo***",
+	// })
 
-	if err != nil {
-		log.Printf("Creating user failed %v", err)
-	} else {
-		log.Println("User created succefully")
+	// if err != nil {
+	// 	log.Printf("Creating user failed %v", err)
+	// } else {
+	// 	log.Println("User created succefully")
+	// }
+
+	users := userRepo.GetAll()
+	log.Printf("Found %v users", len(users))
+
+	user := userRepo.Get(1)
+	log.Printf("user %v", user)
+
+	res := userRepo.Delete(&models.User{}, 3)
+	if res == nil {
+		log.Println("Deleting successful")
 	}
-
-	users := userRepo.GetAll(&models.User{})
-	log.Fatalf("Found %v users", len(users))
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
