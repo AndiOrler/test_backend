@@ -6,57 +6,20 @@ import (
 	"net/http"
 	"test_backend/database"
 	"test_backend/models"
-	"test_backend/user"
 	"test_backend/utils/env"
 
 	"github.com/labstack/echo/v4"
 )
 
 var (
-	environment       string
-	useHTTPGateway    bool
-	useAuthMiddleware bool
-
-	// web
-	serverPort int
-
-	// app
-	logLevel    int
-	dbLogLevel  int
-	apiEndpoint string
-
-	// aws
-	awsRegion          string
-	awsStorageS3Bucket string
-
-	// db
-	dbHost     string
-	dbPort     int
 	dbUser     string
 	dbPassword string
 	dbName     string
 	dbUseSSL   bool
-
-	// mail
-	host        string
-	port        int
-	username    string
-	password    string
-	fromName    string
-	fromAddress string
-
-	mailInformCounterBookingCreate     bool
-	mailInformCounterBookingExtend     bool
-	mailInformCounterBookingDelete     bool
-	mailInformCounterBookingCheckedOut bool
-	mailInformCounterBookingPaid       bool
-	mailInformCounterTimeperiodDelete  bool
-
-	counterMailAddress string
-	mailBlacklist      string
-
-	// file path
-	assetPath string
+	dbHost     string
+	dbPort     int
+	serverPort int
+	dbLogLevel int
 )
 
 func main() {
@@ -88,28 +51,9 @@ func main() {
 		return
 	}
 
-	userRepo := user.NewUserRepo(session.Connection)
-	// err = userRepo.Create(&models.User{
-	// 	Email:    "oo@test.com",
-	// 	Password: "goo***",
-	// })
-
-	// if err != nil {
-	// 	log.Printf("Creating user failed %v", err)
-	// } else {
-	// 	log.Println("User created succefully")
-	// }
-
-	users := userRepo.GetAll()
-	log.Printf("Found %v users", len(users))
-
-	user := userRepo.Get(1)
-	log.Printf("user %v", user)
-
-	res := userRepo.Delete(&models.User{}, 3)
-	if res == nil {
-		log.Println("Deleting successful")
-	}
+	// userRepo := user.NewUserRepo(session.Connection)
+	// userService := user.NewUserService(userRepo)
+	// userRepo.Get//userRepo.Get
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
